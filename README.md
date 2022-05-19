@@ -7,3 +7,4 @@ These lower halves should be dynamically linked and their linked libraries shoul
 We would also want to control where to put each lower half. So, none of the half's collide with each other.
 
 We'll need to build to stub libraries for each lower half.
+For a simple test program, we'll need wrapper for MPI (MPI_Init, MPI_Comm_size, MPI_Comm_rank) and CUDA (cudaMalloc, cudaFree, cudaMemcpy and probably constructor APIs). We can probably handle device functions and cuda constructors after cudaMalloc and cudaFree).
