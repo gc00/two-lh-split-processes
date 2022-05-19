@@ -5,3 +5,5 @@ Kernel Loader should be able to load two or more lower halves. Once it's done lo
 These lower halves should be dynamically linked and their linked libraries should have constructors.
 
 We would also want to control where to put each lower half. So, none of the half's collide with each other.
+
+We'll need to build to stub libraries for each lower half.
