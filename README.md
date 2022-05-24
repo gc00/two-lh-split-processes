@@ -21,3 +21,7 @@ This should have dlsym and function pointers of MPI.
 There can be two designs for the lower-half:
 1. Kernel loader forks two child processes (one CUDA and other MPI lower half) and copy-the-bits both of the child into the upper-half. While this approach works with MPI but it may fail with CUDA as cuda's UVM region can not be shared between two processes.
 2. Make Kernel loader linked with CUDA libraries then fork a child process (lh_proxy) and bring mpi_proxy to the process address space via copy-the-bits).
+
+## Information transfer between upper and lower half (lhInfo)
+Earlier, in CRAC, we were using external file to pass lhInfo to the upper-half. It was fine when we were handling only single process applications. However, for multiple lower-halves, it's better to use an in-memory solution. This time we can use more robust solutions like environment variable.
+Env. var can point to the memory region that contains lower-half related information and the upper-half can use this region to put its information (for lower-half to use at restart). This env. var i.e., LHINFO_PTR, needs to be initialized with 0xffffffffffffffff passed to the kernel-loader. So, we can update once the lower-half initialized.
