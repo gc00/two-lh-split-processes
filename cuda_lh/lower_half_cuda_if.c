@@ -25,24 +25,25 @@
 #include <stdio.h>
 #include <dlfcn.h>
 
-#include <mpi.h>
+#include <cuda.h>
+#include <cuda_runtime.h>
 
-#include "common.h"
-#include "logging.h"
+#include "common/common.h"
+#include "utils/logging.h"
 
-static void* MPI_Fnc_Ptrs[] = {
+static void* Cuda_Fnc_Ptrs[] = {
   NULL,
-  FOREACH_MPI_FNC(GENERATE_FNC_PTR)
+  FOREACH_CUDA_FNC(GENERATE_FNC_PTR)
   NULL,
 };
 
 void*
-lhDlsymMPI(MPI_Fncs_t fnc)
+lhDlsymCuda(Cuda_Fncs_t fnc)
 {
   DLOG(INFO, "LH: Dlsym called with: %d\n", fnc);
-  if (fnc < MPI_Fnc_NULL || fnc > MPI_Fnc_Invalid) {
+  if (fnc < Cuda_Fnc_NULL || fnc > Cuda_Fnc_Invalid) {
     return NULL;
   }
-  void *addr = MPI_Fnc_Ptrs[fnc];
+  void *addr = Cuda_Fnc_Ptrs[fnc];
   return addr;
 }

@@ -37,14 +37,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "common.h"
-#include "custom-loader.h"
-#include "kernel-loader.h"
-#include "procmapsutils.h"
-#include "trampoline_setup.h"
-#include "mmap-wrapper.h"
+#include "common/common.h"
+#include "custom_loader.h"
+#include "kernel_loader.h"
+#include "utils/procmapsutils.h"
+#include "utils/trampoline_setup.h"
+#include "mmap_wrapper.h"
 #include "getmmap.h"
-#include "logging.h"
+#include "utils/logging.h"
 // #include "device_heap_util.h"
 
 LowerHalfInfo_t lhInfo;

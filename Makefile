@@ -9,7 +9,7 @@ RTLD_PATH=/lib64/ld-2.17.so
 CUDA_INCLUDE_PATH=/usr/local/cuda/include/
 
 # The name will be the same as the current directory name.
-KERNEL_LOADER=kernel-loader
+KERNEL_LOADER=kernel_loader
 
 # Wrapper library against which the target application will be linked.
 CUDA_WRAPPER_LIB=cuda_wrappers
@@ -38,16 +38,14 @@ override CXXFLAGS += -g3 -O0 -fPIC ${INCLUDE_FLAGS} -c -std=c++11 \
                   ${WARNING_FLAGS} -fno-stack-protector
 
 # variables related to kernel loader
-KERNEL_LOADER_OBJS=kernel-loader.o custom-loader.o lower_half_mpi_if.o lower_half_cuda_if.o \
-		    mmap-wrapper.o sbrk-wrapper.o switch_context.o procmapsutils.o trampoline_setup.o utils.o
+KERNEL_LOADER_OBJS=loader/kernel_loader.o loader/custom_loader.o mpi_lh/lower_half_mpi_if.o cuda_lh/lower_half_cuda_if.o \
+		    loader/mmap_wrapper.o loader/sbrk_wrapper.o common/switch_context.o utils/procmapsutils.o utils/trampoline_setup.o utils/utils.o
 
 KERNEL_LOADER_CFLAGS=-DSTANDALONE
-KERNEL_LOADER_BIN=kernel-loader.exe
+KERNEL_LOADER_BIN=kernel_loader.exe
 
-TEST_OBJS=simple-hello-world.o
-TEST_EXE=simple-hello-world.exe
-
-UTILITY_OBJS=procmapsutils.o utils.o trampoline_setup.o
+TEST_OBJS=simple_hello_world.o
+TEST_EXE=simple_hello_world.exe
 
 default: lib${CUDA_STUB_LIB}.so lib${MPI_STUB_LIB}.so ${TEST_EXE} \
    ${CUDA_LH_BIN} ${MPI_LH_BIN} ${KERNEL_LOADER_BIN}  lib${CUDA_WRAPPER_LIB}.so lib${MPI_WRAPPER_LIB}.so 
@@ -69,7 +67,7 @@ check: default
 .cpp.o:
 	${CXX} ${CXXFLAGS} $< -o $@
 
-${TEST_OBJS}: test/simple-hello-world.c
+${TEST_OBJS}: test/simple_hello_world.c
 	${CC} ${INCLUDE_FLAGS} ${NVCC_OPTFLAGS} -c $< -o test/$@
 
 ${TEST_EXE}: ${TEST_OBJS}
@@ -79,22 +77,22 @@ ${TEST_EXE}: ${TEST_OBJS}
 ${KERNEL_LOADER_BIN}: ${KERNEL_LOADER_OBJS}
 	${CXX} $^ -o $@ ${MPI_LFLAGS} -L/usr/local/cuda/lib64 -lcudart -ldl
 
-${CUDA_LH_BIN}: cuda_lh.o
+${CUDA_LH_BIN}: cuda_lh/cuda_lh.o
 	${NVCC} ${NVCC_FLAGS} $^ -o $@ -lcuda -ldl
 
-${MPI_LH_BIN}: mpi_lh.o
+${MPI_LH_BIN}: mpi_lh/mpi_lh.o
 	${MPICC} ${MPI_OPTFLAGS} $^ -o $@ ${MPI_FLAGS}
 
-lib${CUDA_WRAPPER_LIB}.so: cuda_wrappers.o
+lib${CUDA_WRAPPER_LIB}.so: cuda_wrappers/cuda_wrappers.o
 	${CC} -shared -fPIC -g3 -O0 -o $@ $^
 
-lib${MPI_WRAPPER_LIB}.so: mpi_wrappers.o
+lib${MPI_WRAPPER_LIB}.so: mpi_wrappers/mpi_wrappers.o
 	${CC} -shared -fPIC -g3 -O0 -o $@ $^
 
-lib${CUDA_STUB_LIB}.so: cuda_stub.o
+lib${CUDA_STUB_LIB}.so: cuda_wrappers/cuda_stub.o
 	${CC} -shared -fPIC -g3 -O0 -o $@ $^
 
-lib${MPI_STUB_LIB}.so: mpi_stub.o
+lib${MPI_STUB_LIB}.so: mpi_wrappers/mpi_stub.o
 	${CC} -shared -fPIC -g3 -O0 -o $@ $^
 
 run: ${KERNEL_LOADER_BIN} ${TEST_EXE}
@@ -117,6 +115,6 @@ tidy:
 	rm -f *.exe
 
 clean: tidy
-	rm -f *.o *.so test/*.o test/*.exe*
+	rm -f */*.o *.so test/*.o test/*.exe*
 
 .PHONY: dist vi vim clean gdb tags tidy enableASLR disableASLR check

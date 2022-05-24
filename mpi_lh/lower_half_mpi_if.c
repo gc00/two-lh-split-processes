@@ -19,14 +19,30 @@
  *  <http://www.gnu.org/licenses/>.                                         *
  ****************************************************************************/
 
-#include <vector>
-#include "common.h"
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#include <stdio.h>
+#include <dlfcn.h>
 
-std::vector<MmapInfo_t>& getMmappedList(int *num);
-typedef std::vector<MmapInfo_t>& (*GetMmappedListFptr_t)(int *num);
+#include <mpi.h>
 
-std::vector<CudaCallLog_t>& getCudaCallsLog();
-typedef std::vector<CudaCallLog_t>& (*GetCudaCallsLogFptr_t)();
+#include "common/common.h"
+#include "utils/logging.h"
 
-void * getEndOfHeap();
-typedef void *(*GetEndOfHeapFptr_t)();
+static void* MPI_Fnc_Ptrs[] = {
+  NULL,
+  FOREACH_MPI_FNC(GENERATE_FNC_PTR)
+  NULL,
+};
+
+void*
+lhDlsymMPI(MPI_Fncs_t fnc)
+{
+  DLOG(INFO, "LH: Dlsym called with: %d\n", fnc);
+  if (fnc < MPI_Fnc_NULL || fnc > MPI_Fnc_Invalid) {
+    return NULL;
+  }
+  void *addr = MPI_Fnc_Ptrs[fnc];
+  return addr;
+}

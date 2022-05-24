@@ -19,31 +19,51 @@
  *  <http://www.gnu.org/licenses/>.                                         *
  ****************************************************************************/
 
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-#include <stdio.h>
-#include <dlfcn.h>
+#ifndef KERNEL_LOADER_H
+#define KERNEL_LOADER_H
 
-#include <cuda.h>
-#include <cuda_runtime.h>
-
-#include "common.h"
-#include "logging.h"
-
-static void* Cuda_Fnc_Ptrs[] = {
-  NULL,
-  FOREACH_CUDA_FNC(GENERATE_FNC_PTR)
-  NULL,
-};
-
-void*
-lhDlsymCuda(Cuda_Fncs_t fnc)
+#include "mmap_wrapper.h"
+// Returns pointer to argc, given a pointer to end of stack
+static inline void*
+GET_ARGC_ADDR(const void* stackEnd)
 {
-  DLOG(INFO, "LH: Dlsym called with: %d\n", fnc);
-  if (fnc < Cuda_Fnc_NULL || fnc > Cuda_Fnc_Invalid) {
-    return NULL;
-  }
-  void *addr = Cuda_Fnc_Ptrs[fnc];
-  return addr;
+  return (void*)((uintptr_t)(stackEnd) + sizeof(uintptr_t));
 }
+
+// Returns pointer to argv[0], given a pointer to end of stack
+static inline void*
+GET_ARGV_ADDR(const void* stackEnd)
+{
+  return (void*)((unsigned long)(stackEnd) + 2 * sizeof(uintptr_t));
+}
+
+// Returns pointer to env[0], given a pointer to end of stack
+static inline void*
+GET_ENV_ADDR(char **argv, int argc)
+{
+  return (void*)&argv[argc + 1];
+}
+
+// Returns a pointer to aux vector, given a pointer to the environ vector
+// on the stack
+static inline ElfW(auxv_t)*
+GET_AUXV_ADDR(const char **env)
+{
+  ElfW(auxv_t) *auxvec;
+  const char **evp = env;
+  while (*evp++ != NULL);
+  auxvec = (ElfW(auxv_t) *) evp;
+  return auxvec;
+}
+#ifdef __cplusplus
+extern "C" {
+#endif
+  void runRtld();
+  void* sbrkWrapper(intptr_t );
+  void setUhBrk(void *);
+  void copy_lower_half_data();
+#ifdef __cplusplus
+}
+#endif
+
+#endif // ifndef KERNEL_LOADER_H

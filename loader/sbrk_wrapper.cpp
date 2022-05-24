@@ -23,11 +23,11 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-#include "common.h"
-#include "logging.h"
-#include "kernel-loader.h"
+#include "common/common.h"
+#include "utils/logging.h"
+#include "kernel_loader.h"
 #include "getmmap.h"
-#include "switch_context.h"
+#include "common/switch_context.h"
 
 static void *__curbrk;
 static void *__endOfHeap = 0;

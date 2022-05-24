@@ -1,6 +1,6 @@
 #include <cuda_runtime.h>
-#include "switch_context.h"
-#include "common.h"
+#include "common/switch_context.h"
+#include "common/common.h"
 
 #define REAL_FNC(fnc) \
   ({ fnc##_t fnc##Fnc = (fnc##_t) -1; \

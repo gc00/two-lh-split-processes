@@ -38,8 +38,8 @@
 #include <cublas.h>
 #include <cusolverDn.h>
 
-#include "lower_half_cuda_if.h"
-#include "lower_half_mpi_if.h"
+#include "cuda_lh/lower_half_cuda_if.h"
+#include "mpi_lh/lower_half_mpi_if.h"
 
 typedef char* VA;  /* VA = virtual address */
 

@@ -33,13 +33,13 @@
 #include <vector>
 #include <algorithm>
 
-#include "common.h"
-#include "logging.h"
-#include "kernel-loader.h"
-#include "utils.h"
-#include "trampoline_setup.h"
+#include "common/common.h"
+#include "utils/logging.h"
+#include "kernel_loader.h"
+#include "utils/utils.h"
+#include "utils/trampoline_setup.h"
 #include "getmmap.h"
-#include "switch_context.h"
+#include "common/switch_context.h"
 
 using namespace std;
 

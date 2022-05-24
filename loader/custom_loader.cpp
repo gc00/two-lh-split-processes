@@ -31,11 +31,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "common.h"
-#include "logging.h"
-#include "custom-loader.h"
-#include "kernel-loader.h"
-#include "trampoline_setup.h"
+#include "common/common.h"
+#include "utils/logging.h"
+#include "custom_loader.h"
+#include "kernel_loader.h"
+#include "utils/trampoline_setup.h"
 
 #define UBUNTU 1
 

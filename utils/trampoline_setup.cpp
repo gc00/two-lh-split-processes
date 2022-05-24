@@ -36,7 +36,7 @@
 #include <sys/stat.h>
 
 #include "trampoline_setup.h"
-#include "common.h"
+#include "common/common.h"
 #include "logging.h"
 
 // Returns offset of symbol, or -1 on failure.
