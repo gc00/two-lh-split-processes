@@ -34,6 +34,9 @@ Multiple threads can jump to same or different lower halves. We need a thread-sa
 Consider following scenario:
 
 Thread 1 --------->|Jumps to LH|--------> Access its TLS area
+
 Thread 2 --------->|Jumps to LH|--------> Does NOT access its TLS area and just call CUDA naively
+
 Thread 3 --------->|Jumps to LH|--------> Access its TLS area
+
 We have seen this kind of behavior with OpenGL applications.
