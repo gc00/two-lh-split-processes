@@ -30,15 +30,7 @@
 #include <linux/limits.h>
 #include <sys/prctl.h>
 #include <sys/syscall.h>
-#include <cuda.h>
-#include <cuda_runtime.h>
-#include <cuda_runtime_api.h>
-#include <driver_types.h>
-#include <cusparse_v2.h>
-#include <cublas.h>
-#include <cusolverDn.h>
 
-#include "cuda_lh/lower_half_cuda_if.h"
 #include "mpi_lh/lower_half_mpi_if.h"
 
 typedef char* VA;  /* VA = virtual address */
@@ -80,22 +72,17 @@ typedef struct __LowerHalfInfo
   void *lhSbrk;
   void *lhMmap;
   void *lhMunmap;
-  void *lhDlsymCuda;
   void *lhDlsymMPI;
   unsigned long lhFsAddr;
   void *lhMmapListFptr;
   void *uhEndofHeapFptr;
-  void *lhGetDeviceHeapFptr;
-  void *lhCopyToCudaPtrFptr;
   void *lhDeviceHeap;
-  void *getFatCubinHandle;
 } LowerHalfInfo_t;
 
 typedef struct __UpperHalfInfo
 {
   void *uhEndofHeap;
   void *lhPagesRegion;
-  void *cudaLogVectorFptr;
 } UpperHalfInfo_t;
 
 typedef struct __MmapInfo
@@ -104,34 +91,16 @@ typedef struct __MmapInfo
   size_t len;
 } MmapInfo_t;
 
-typedef struct __CudaCallLog{
-  char *fncargs;
-  size_t size;
-  char *results;
-  size_t res_size;
-} CudaCallLog_t;
-
 extern LowerHalfInfo_t lhInfo;
 extern UpperHalfInfo_t uhInfo;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-void* lhDlsymCuda(Cuda_Fncs_t type);
 void* lhDlsymMPI(MPI_Fncs_t type);
-void** fatHandle();
 #ifdef __cplusplus
 }
 #endif
 
-typedef void* (*LhDlsymCuda_t)(Cuda_Fncs_t type);
 typedef void* (*LhDlsymMPI_t)(MPI_Fncs_t type);
-
-//getter function returning new_fatCubinHandle
-// from the replay code
-typedef void** (*fatHandle_t)();
-
-
-//global_fatCubinHandle defined in cuda-plugin.cpp
-extern void ** global_fatCubinHandle;
-#endif // ifndef COMMON_H
+#endif //ifndef COMMON_H

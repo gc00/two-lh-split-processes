@@ -38,7 +38,7 @@ override CXXFLAGS += -g3 -O0 -fPIC ${INCLUDE_FLAGS} -c -std=c++11 \
                   ${WARNING_FLAGS} -fno-stack-protector
 
 # variables related to kernel loader
-KERNEL_LOADER_OBJS=loader/kernel_loader.o loader/custom_loader.o mpi_lh/lower_half_mpi_if.o cuda_lh/lower_half_cuda_if.o \
+KERNEL_LOADER_OBJS=loader/kernel_loader.o loader/custom_loader.o mpi_lh/lower_half_mpi_if.o \
 		    loader/mmap_wrapper.o loader/sbrk_wrapper.o common/switch_context.o utils/procmapsutils.o utils/trampoline_setup.o utils/utils.o
 
 KERNEL_LOADER_CFLAGS=-DSTANDALONE
@@ -46,6 +46,8 @@ KERNEL_LOADER_BIN=kernel_loader.exe
 
 TEST_OBJS=simple_hello_world.o
 TEST_EXE=simple_hello_world.exe
+
+mpi: lib${MPI_STUB_LIB}.so ${TEST_EXE} ${MPI_LH_BIN} ${KERNEL_LOADER_BIN} lib${MPI_WRAPPER_LIB}.so 
 
 default: lib${CUDA_STUB_LIB}.so lib${MPI_STUB_LIB}.so ${TEST_EXE} \
    ${CUDA_LH_BIN} ${MPI_LH_BIN} ${KERNEL_LOADER_BIN}  lib${CUDA_WRAPPER_LIB}.so lib${MPI_WRAPPER_LIB}.so 
@@ -68,11 +70,10 @@ check: default
 	${CXX} ${CXXFLAGS} $< -o $@
 
 ${TEST_OBJS}: test/simple_hello_world.c
-	${CC} ${INCLUDE_FLAGS} ${NVCC_OPTFLAGS} -c $< -o test/$@
+	${CC} ${INCLUDE_FLAGS} -c $< -o test/$@
 
 ${TEST_EXE}: ${TEST_OBJS}
-	${CXX} test/$< -o test/$@ -L. -l${CUDA_STUB_LIB} -l${MPI_STUB_LIB} ;
-	${NVCC} -g test/$< -o test/${TEST_EXE}.native ${MPI_LFLAGS}
+	${CXX} test/$< -o test/$@ -L. -l${MPI_STUB_LIB}
 
 ${KERNEL_LOADER_BIN}: ${KERNEL_LOADER_OBJS}
 	${CXX} $^ -o $@ ${MPI_LFLAGS} -L/usr/local/cuda/lib64 -lcudart -ldl

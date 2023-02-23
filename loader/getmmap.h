@@ -25,8 +25,5 @@
 std::vector<MmapInfo_t>& getMmappedList(int *num);
 typedef std::vector<MmapInfo_t>& (*GetMmappedListFptr_t)(int *num);
 
-std::vector<CudaCallLog_t>& getCudaCallsLog();
-typedef std::vector<CudaCallLog_t>& (*GetCudaCallsLogFptr_t)();
-
 void * getEndOfHeap();
 typedef void *(*GetEndOfHeapFptr_t)();

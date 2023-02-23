@@ -49,7 +49,7 @@
 
 LowerHalfInfo_t lhInfo;
 UpperHalfInfo_t uhInfo;
-static void readUhInfoAddr();
+//static void readUhInfoAddr();
 
 // Local function declarations
 static void getProcStatField(enum Procstat_t , char *, size_t );
@@ -528,7 +528,6 @@ setupLowerHalfInfo()
   lhInfo.lhSbrk = (void *)&sbrkWrapper;
   lhInfo.lhMmap = (void *)&mmapWrapper;
   lhInfo.lhMunmap = (void *)&munmapWrapper;
-  lhInfo.lhDlsymCuda = (void *)&lhDlsymCuda;
   lhInfo.lhDlsymMPI = (void *)&lhDlsymMPI;
   lhInfo.lhMmapListFptr = (void *)&getMmappedList;
   lhInfo.uhEndofHeapFptr = (void *)&getEndOfHeap;
