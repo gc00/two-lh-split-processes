@@ -28,7 +28,7 @@ NVCC_CFLAGS=-Xcompiler -g3 -O0
 MPI_LFLAGS=-lmpi
 MPI_CFLAGS=
 
-INCLUDE_FLAGS=-I. -I${CUDA_INCLUDE_PATH}
+INCLUDE_FLAGS=-I.
 
 WARNING_FLAGS=-Wall -Wno-deprecated-declarations -Werror
 
@@ -49,8 +49,11 @@ TEST_EXE=simple_hello_world.exe
 
 mpi: lib${MPI_STUB_LIB}.so ${TEST_EXE} ${MPI_LH_BIN} ${KERNEL_LOADER_BIN} lib${MPI_WRAPPER_LIB}.so 
 
-default: lib${CUDA_STUB_LIB}.so lib${MPI_STUB_LIB}.so ${TEST_EXE} \
-   ${CUDA_LH_BIN} ${MPI_LH_BIN} ${KERNEL_LOADER_BIN}  lib${CUDA_WRAPPER_LIB}.so lib${MPI_WRAPPER_LIB}.so 
+default: lib${MPI_STUB_LIB}.so ${TEST_EXE} \
+   ${MPI_LH_BIN} ${KERNEL_LOADER_BIN}  lib${MPI_WRAPPER_LIB}.so 
+
+# default: lib${CUDA_STUB_LIB}.so lib${MPI_STUB_LIB}.so ${TEST_EXE} \
+#   ${CUDA_LH_BIN} ${MPI_LH_BIN} ${KERNEL_LOADER_BIN}  lib${CUDA_WRAPPER_LIB}.so lib${MPI_WRAPPER_LIB}.so 
 
 disableASLR:
 	@- [ `cat /proc/sys/kernel/randomize_va_space` = 0 ] \
@@ -76,7 +79,7 @@ ${TEST_EXE}: ${TEST_OBJS}
 	${CXX} test/$< -o test/$@ -L. -l${MPI_STUB_LIB}
 
 ${KERNEL_LOADER_BIN}: ${KERNEL_LOADER_OBJS}
-	${CXX} $^ -o $@ ${MPI_LFLAGS} -L/usr/local/cuda/lib64 -lcudart -ldl
+	${CXX} $^ -o $@ ${MPI_LFLAGS} -ldl
 
 ${CUDA_LH_BIN}: cuda_lh/cuda_lh.o
 	${NVCC} ${NVCC_FLAGS} $^ -o $@ -lcuda -ldl
@@ -97,10 +100,10 @@ lib${MPI_STUB_LIB}.so: mpi_wrappers/mpi_stub.o
 	${CC} -shared -fPIC -g3 -O0 -o $@ $^
 
 run: ${KERNEL_LOADER_BIN} ${TEST_EXE}
-	TARGET_LD=${RTLD_PATH} ./$< $$PWD/test/${TARGET_BIN} arg1 arg2 arg3
+	UH_PRELOAD=$$PWD/libmpi_wrappers.so TARGET_LD=${RTLD_PATH} ./$< $$PWD/test/${TEST_EXE}
 
 gdb: ${KERNEL_LOADER_BIN} ${TEST_EXE}
-	TARGET_LD=${RTLD_PATH} gdb --args ./$< $$PWD/test/${TEST_EXE} arg1 arg2 arg3
+	UH_PRELOAD=$$PWD/libmpi_wrappers.so TARGET_LD=${RTLD_PATH} gdb --args ./$< $$PWD/test/${TEST_EXE}
 
 vi vim:
 	vim ${FILE}.cpp
